@@ -1,4 +1,3 @@
-# api/infrastructure/persistence/migrations/env.py
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -10,6 +9,7 @@ from alembic import context
 from infrastructure.persistence.base import Base
 import infrastructure.persistence.user_entity
 import infrastructure.persistence.video_entity
+import infrastructure.persistence.transcript_entity
 
 # This is the Alembic Config object
 config = context.config

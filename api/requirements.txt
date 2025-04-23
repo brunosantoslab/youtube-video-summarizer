@@ -1,3 +1,5 @@
+# api/requirements.txt
+
 # FastAPI and ASGI server
 fastapi>=0.95.0
 uvicorn>=0.22.0
@@ -6,7 +8,7 @@ pydantic>=2.0.0
 # Database
 sqlalchemy>=2.0.0
 psycopg2-binary>=2.9.6
-alembic>=1.11.1
+alembic>=1.11.1          # Added for database migrations
 
 # Authentication
 python-jose>=3.3.0
@@ -17,6 +19,7 @@ python-multipart>=0.0.6
 httpx>=0.24.0
 pyyaml>=6.0
 requests>=2.31.0
+yt-dlp>=2023.3.4         # Added for video downloads
 
 # Background tasks
 celery>=5.3.0
@@ -30,6 +33,7 @@ openai>=0.27.8
 pytest>=7.3.1
 pytest-asyncio>=0.21.0
 pytest-cov>=4.1.0
+pytest-mock>=3.10.0
 
 # Utils
 python-dotenv>=1.0.0
