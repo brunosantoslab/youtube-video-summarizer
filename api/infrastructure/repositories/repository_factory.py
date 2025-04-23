@@ -5,8 +5,10 @@ from sqlalchemy.orm import Session
 from domain.repositories.base_repository import IRepository
 from domain.repositories.user_repository import IUserRepository
 from domain.repositories.video_repository import IVideoRepository
+from domain.repositories.transcript_repository import ITranscriptRepository
 from infrastructure.repositories.user_repository import PostgresUserRepository
 from infrastructure.repositories.video_repository import PostgresVideoRepository
+from infrastructure.repositories.transcript_repository import PostgresTranscriptRepository
 
 
 class RepositoryFactory:
@@ -17,6 +19,7 @@ class RepositoryFactory:
         self.repositories: Dict[Type[IRepository], Type[Any]] = {
             IUserRepository: PostgresUserRepository,
             IVideoRepository: PostgresVideoRepository,
+            ITranscriptRepository: PostgresTranscriptRepository,
         }
         self._instances: Dict[Type[IRepository], IRepository] = {}
     
