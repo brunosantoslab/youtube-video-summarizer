@@ -13,6 +13,8 @@ from domain.repositories.summary_repository import ISummaryRepository
 from infrastructure.repositories.summary_repository import PostgresSummaryRepository
 from domain.repositories.topic_repository import ITopicRepository
 from infrastructure.repositories.topic_repository import PostgresTopicRepository
+from domain.repositories.processing_repository import IProcessingRepository
+from infrastructure.repositories.processing_repository import PostgresProcessingRepository
 
 
 class RepositoryFactory:
@@ -25,7 +27,8 @@ class RepositoryFactory:
             IVideoRepository: PostgresVideoRepository,
             ITranscriptRepository: PostgresTranscriptRepository,
             ISummaryRepository: PostgresSummaryRepository,
-            ITopicRepository: PostgresTopicRepository,  # Added
+            ITopicRepository: PostgresTopicRepository,
+            IProcessingRepository: PostgresProcessingRepository,  # Added
         }
         self._instances: Dict[Type[IRepository], IRepository] = {}
     
