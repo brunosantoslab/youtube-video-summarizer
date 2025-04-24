@@ -9,6 +9,8 @@ from domain.repositories.transcript_repository import ITranscriptRepository
 from infrastructure.repositories.user_repository import PostgresUserRepository
 from infrastructure.repositories.video_repository import PostgresVideoRepository
 from infrastructure.repositories.transcript_repository import PostgresTranscriptRepository
+from domain.repositories.summary_repository import ISummaryRepository
+from infrastructure.repositories.summary_repository import PostgresSummaryRepository
 
 
 class RepositoryFactory:
@@ -20,6 +22,7 @@ class RepositoryFactory:
             IUserRepository: PostgresUserRepository,
             IVideoRepository: PostgresVideoRepository,
             ITranscriptRepository: PostgresTranscriptRepository,
+            ISummaryRepository: PostgresSummaryRepository,  # Added
         }
         self._instances: Dict[Type[IRepository], IRepository] = {}
     
