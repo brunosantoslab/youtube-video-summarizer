@@ -217,6 +217,39 @@ This document tracks important architectural decisions made during the developme
   - Negative: More complex task monitoring, potential for increased debugging complexity
 - **Alternatives Considered**: Synchronous processing with better error handling, direct service calls
 
+### [YVS-DL-045] Comprehensive AI Cost Optimization
+
+- **Date**: 2025-04-24
+- **Status**: Approved
+- **Context**: Need to optimize costs and manage budget for AI operations as usage scales
+- **Decision**: Implement a multi-layered AI optimization system with token optimization, budget tracking, and enhanced caching
+- **Consequences**: 
+  - Positive: Reduced operational costs, better scalability, predictable spending
+  - Negative: Additional complexity in implementation, needs careful tuning
+- **Alternatives Considered**: Simple caching only, fixed quotas, single provider optimization
+
+### [YVS-DL-046] Token-Based Budget Management
+
+- **Date**: 2025-04-24
+- **Status**: Approved
+- **Context**: Need to track and manage AI costs across different providers with different pricing models
+- **Decision**: Implement a token-based budget tracking system that converts all usage to a common cost model
+- **Consequences**: 
+  - Positive: Clear cost visibility, ability to set daily/monthly limits, provider comparisons
+  - Negative: Requires regular updates to pricing models, some estimation involved
+- **Alternatives Considered**: Provider-specific budget tracking, request-count-based limits
+
+### [YVS-DL-047] Token Optimization Strategies
+
+- **Date**: 2025-04-24
+- **Status**: Approved
+- **Context**: Need to reduce token usage for large transcripts and prompts to stay within limits and reduce costs
+- **Decision**: Implement intelligent token optimization strategies using summarization techniques, redundancy removal, and content distillation
+- **Consequences**: 
+  - Positive: Reduced token usage, ability to process longer content, lower costs
+  - Negative: Potential information loss, need for careful tuning to maintain quality
+- **Alternatives Considered**: Simple truncation, fixed chunk splitting, manual prompt engineering
+
 ## Frontend Decisions
 
 ### [YVS-DL-008] React with TypeScript for Frontend

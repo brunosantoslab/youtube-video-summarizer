@@ -1,6 +1,6 @@
 # api/infrastructure/external/ai/provider_interface.py
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 
 class AIProviderInterface(ABC):

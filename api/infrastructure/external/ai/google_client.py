@@ -1,30 +1,32 @@
 # api/infrastructure/external/ai/google_client.py
 import logging
 import time
-from typing import Dict, List, Any, Optional
-import json
+from typing import Dict, Any, Optional
 
 import google.generativeai as genai
 from google.generativeai.types import GenerateContentResponse
 
 from config import get_settings
+from infrastructure.external.ai.provider_interface import AIProviderInterface
+from infrastructure.external.ai.token_optimizer import TokenOptimizer
 
 logger = logging.getLogger(__name__)
 
 
-class GoogleAIClient:
+class GoogleAIClient(AIProviderInterface):
     """Client for Google Gemini AI APIs"""
     
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or get_settings().google_ai_api_key
         genai.configure(api_key=self.api_key)
         self.model = None
+        self.token_optimizer = TokenOptimizer()
     
     async def generate_summary(
         self, 
         transcript_text: str, 
         max_length: int = 500,
-        model_name: str = "gemini-pro"
+        model: str = None
     ) -> Dict[str, Any]:
         """
         Generate a summary from transcript text
@@ -32,11 +34,14 @@ class GoogleAIClient:
         Args:
             transcript_text: The text to summarize
             max_length: Maximum length of summary in tokens
-            model_name: Model to use for summarization
+            model: Model to use for summarization
             
         Returns:
             Dictionary with summary and metadata
         """
+        # Set default model
+        model_name = model or "gemini-pro"
+        
         try:
             start_time = time.time()
             
@@ -47,9 +52,25 @@ class GoogleAIClient:
             # Create prompt
             prompt = self._create_summary_prompt(transcript_text, max_length)
             
+            # Optimize prompt if enabled
+            if hasattr(self, 'token_optimizer') and get_settings().ai_prompt_optimization_enabled:
+                # Google doesn't use separate system/user prompts, so we optimize just the user prompt
+                optimized_prompts, token_counts = self.token_optimizer.optimize_prompt(
+                    system_prompt="",
+                    user_prompt=prompt,
+                    model="gemini-pro"  # Use Gemini model for token counting
+                )
+                prompt_to_use = optimized_prompts["user"]
+                logger.info(f"Using optimized prompt: {token_counts['user']} tokens")
+            else:
+                prompt_to_use = prompt
+            
+            # Estimate token count
+            input_tokens = self.token_optimizer.count_tokens(prompt_to_use, "gemini-pro")
+            
             # Call the Google AI API
             response = self.model.generate_content(
-                prompt,
+                prompt_to_use,
                 generation_config={
                     "temperature": 0.5,
                     "max_output_tokens": max_length,
@@ -62,14 +83,20 @@ class GoogleAIClient:
             # Calculate processing time
             processing_time = time.time() - start_time
             
+            # Estimate output tokens
+            output_tokens = self.token_optimizer.count_tokens(summary_text, "gemini-pro")
+            
             # Return result with metadata
             return {
                 "text": summary_text,
                 "model": model_name,
+                "provider": "google",
                 "metadata": {
                     "processing_time": processing_time,
-                    "token_count": 0,  # Google doesn't expose this
-                    "prompt_version": "1.0",
+                    "token_count": input_tokens + output_tokens,  # Estimated
+                    "prompt_tokens": input_tokens,  # Estimated
+                    "completion_tokens": output_tokens,  # Estimated
+                    "prompt_version": "1.1",
                     "model_parameters": {
                         "temperature": 0.5,
                         "max_output_tokens": max_length
