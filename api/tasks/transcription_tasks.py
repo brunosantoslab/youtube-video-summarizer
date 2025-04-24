@@ -11,7 +11,7 @@ from infrastructure.repositories.repository_factory import get_repository_factor
 from infrastructure.external.youtube.client import YouTubeApiClient
 from infrastructure.external.youtube.audio_downloader import YouTubeAudioDownloader
 from infrastructure.external.ai.whisper_client import WhisperApiClient
-from application.events.redis_event_publisher import RedisEventPublisher
+from api.infrastructure.events.redis_event_publisher import RedisEventPublisher
 from domain.repositories.video_repository import IVideoRepository
 from domain.repositories.transcript_repository import ITranscriptRepository
 from application.services.transcription_service import TranscriptionService
