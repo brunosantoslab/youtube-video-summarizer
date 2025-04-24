@@ -1,28 +1,30 @@
 # api/infrastructure/external/ai/openai_client.py
 import logging
 import time
-from typing import Dict, List, Any, Optional
+from typing import Dict, Any, Optional
 
-import openai
 from openai import OpenAI
 
 from config import get_settings
+from infrastructure.external.ai.provider_interface import AIProviderInterface
+from infrastructure.external.ai.token_optimizer import TokenOptimizer
 
 logger = logging.getLogger(__name__)
 
 
-class OpenAIClient:
+class OpenAIClient(AIProviderInterface):
     """Client for OpenAI APIs"""
     
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or get_settings().openai_api_key
         self.client = OpenAI(api_key=self.api_key)
+        self.token_optimizer = TokenOptimizer()
     
     async def generate_summary(
         self, 
         transcript_text: str, 
         max_length: int = 500,
-        model: str = "gpt-4"
+        model: str = None
     ) -> Dict[str, Any]:
         """
         Generate a summary from transcript text
@@ -35,18 +37,35 @@ class OpenAIClient:
         Returns:
             Dictionary with summary and metadata
         """
+        # Set default model
+        model = model or "gpt-4"
+        
         try:
             start_time = time.time()
             
             # Create prompt
             prompt = self._create_summary_prompt(transcript_text, max_length)
             
+            # Optimize prompt if token optimizer is available
+            if hasattr(self, 'token_optimizer') and get_settings().ai_prompt_optimization_enabled:
+                optimized_prompts, token_counts = self.token_optimizer.optimize_prompt(
+                    system_prompt=prompt["system"],
+                    user_prompt=prompt["user"],
+                    model=model
+                )
+                system_prompt = optimized_prompts["system"]
+                user_prompt = optimized_prompts["user"]
+                logger.info(f"Using optimized prompts: {token_counts['total']} tokens")
+            else:
+                system_prompt = prompt["system"]
+                user_prompt = prompt["user"]
+            
             # Call the OpenAI API
             response = self.client.chat.completions.create(
                 model=model,
                 messages=[
-                    {"role": "system", "content": prompt["system"]},
-                    {"role": "user", "content": prompt["user"]}
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
                 ],
                 max_tokens=max_length,
                 temperature=0.5
@@ -62,10 +81,13 @@ class OpenAIClient:
             return {
                 "text": summary_text,
                 "model": model,
+                "provider": "openai",
                 "metadata": {
                     "processing_time": processing_time,
                     "token_count": response.usage.total_tokens,
-                    "prompt_version": "1.0",
+                    "prompt_tokens": response.usage.prompt_tokens,
+                    "completion_tokens": response.usage.completion_tokens,
+                    "prompt_version": "1.1",
                     "model_parameters": {
                         "temperature": 0.5,
                         "max_tokens": max_length
