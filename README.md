@@ -41,6 +41,9 @@ YouTube Video Summarizer monitors your YouTube subscriptions for new videos, use
 - **Containerization**: Docker
 - **Development**: Docker Compose
 - **CI/CD**: GitHub Actions
+- **Testing**: 
+  - Fast unit tests with mocks
+  - Integration tests with TestContainers for ephemeral environments
 
 ## Architecture
 
@@ -58,6 +61,22 @@ The application follows Clean Architecture with Domain-Driven Design principles:
 - **AI Summarizer**: Generates concise summaries and extracts topics
 - **Dashboard**: User interface for viewing and organizing summaries
 
+### YouTube API Integration
+
+The application integrates with YouTube APIs through several specialized components:
+
+- **OAuth Authentication**: Secure authentication flow using OAuth 2.0 protocol
+- **Channels API Client**: Retrieves subscription and channel data
+- **Videos API Client**: Fetches video metadata and content
+- **Captions API Client**: Extracts and processes video transcripts
+- **API Service**: Comprehensive service combining all YouTube API operations
+
+The authentication implementation includes:
+- Token encryption for secure storage
+- Automatic token refresh management
+- Session integration with the application
+- Comprehensive error handling and rate limit management
+
 ## Getting Started
 
 ### Prerequisites
@@ -66,6 +85,7 @@ The application follows Clean Architecture with Domain-Driven Design principles:
 - YouTube API credentials
 - OpenAI API key (or other supported AI provider)
 - Neon PostgreSQL database
+- System dependencies for running tests (see [system dependencies](/docs/setup/system_dependencies.md))
 
 ### Installation
 
@@ -77,23 +97,23 @@ The application follows Clean Architecture with Domain-Driven Design principles:
 
 2. Create a `.env` file with your configuration:
    ```
-   # Database
-   DATABASE_URL=postgresql://user:password@neon-db-host/yvs
+   # Database - Already configured for Docker environment
+   DATABASE_URL=postgresql://postgres:postgres@db:5432/yvs
    
-   # Redis
+   # Redis - Already configured for Docker environment
    REDIS_URL=redis://redis:6379/0
    
-   # YouTube API
+   # YouTube API - You need to provide these values
    YOUTUBE_API_KEY=your_api_key
    YOUTUBE_CLIENT_ID=your_client_id
    YOUTUBE_CLIENT_SECRET=your_client_secret
-   YOUTUBE_REDIRECT_URI=http://localhost:8000/auth/youtube/callback
+   YOUTUBE_REDIRECT_URI=http://localhost:8000/api/auth/youtube/callback
    
-   # AI Providers
+   # AI Providers - You need to provide these values
    OPENAI_API_KEY=your_openai_key
    GOOGLE_AI_API_KEY=your_google_ai_key
    
-   # Application
+   # Application - Already configured with defaults
    SECRET_KEY=your_secret_key
    DEBUG=true
    ENVIRONMENT=development
@@ -104,27 +124,43 @@ The application follows Clean Architecture with Domain-Driven Design principles:
    docker-compose up -d
    ```
 
-4. Run database migrations:
-   ```bash
-   docker-compose exec api alembic upgrade head
-   ```
-
-5. Access the application:
+4. Access the application:
    - Backend API: http://localhost:8000
    - Frontend UI: http://localhost:3000
 
 ### Development Workflow
 
-1. **Backend Development**:
+1. **Docker-Based Development** (recommended for full stack):
    ```bash
-   # Run backend tests
-   docker-compose exec api pytest
+   # Start service in development mode
+   docker-compose up -d
    
    # Generate migrations
    docker-compose exec api alembic revision --autogenerate -m "Description"
+   
+   # Apply migrations
+   docker-compose exec api alembic upgrade head
    ```
 
-2. **Frontend Development**:
+2. **Local Development with Neon PostgreSQL** (without Docker):
+   ```bash
+   # Create a .env.local file with your Neon PostgreSQL connection string
+   # DATABASE_URL=postgresql://username:password@your-neon-hostname/dbname?sslmode=require
+   
+   # Copy the environment file to the API directory
+   cp .env.local api/.env
+   
+   # Navigate to the API directory
+   cd api
+   
+   # Apply migrations (may need to restart IDE first to refresh environment)
+   alembic upgrade head
+   
+   # Run tests
+   python -m pytest tests/unit
+   ```
+
+3. **Frontend Development**:
    ```bash
    # Install dependencies
    cd frontend
@@ -132,51 +168,121 @@ The application follows Clean Architecture with Domain-Driven Design principles:
    
    # Start development server
    npm run dev
-   
-   # Run tests
-   npm test
    ```
 
 ## Project Structure
 
 ```
 .
-├── api/                 # Backend API
-│   ├── domain/          # Domain layer
-│   ├── application/     # Application services
-│   ├── infrastructure/  # External integrations
-│   └── presentation/    # API controllers
-├── frontend/            # React frontend
-│   ├── public/          # Static assets
-│   └── src/             # Source code
-├── tests/               # Test suites
-│   ├── unit/            # Unit tests
-│   ├── integration/     # Integration tests
-│   └── e2e/             # End-to-end tests
-├── docker/              # Docker configuration
-├── docs/                # Documentation
-├── scripts/             # Utility scripts
-├── .github/             # GitHub workflows
-├── docker-compose.yml   # Development environment
-└── README.md            # This file
+├── api/                     # Backend API
+│   ├── domain/              # Domain layer
+│   │   ├── models/          # Domain entities
+│   │   └── repositories/    # Repository interfaces
+│   ├── application/         # Application services
+│   │   ├── dtos/            # Data Transfer Objects
+│   │   └── services/        # Business logic services
+│   ├── infrastructure/      # External integrations
+│   │   ├── auth/            # Authentication services
+│   │   ├── persistence/     # Database ORM entities
+│   │   ├── repositories/    # Repository implementations
+│   │   └── youtube/         # YouTube API clients
+│   └── presentation/        # API controllers
+│       └── routes/          # API routes
+├── frontend/                # React frontend
+│   ├── public/              # Static assets
+│   └── src/                 # Source code
+├── tests/                   # Test suites
+│   ├── unit/                # Unit tests
+│   ├── integration/         # Integration tests
+│   └── e2e/                 # End-to-end tests
+├── docker/                  # Docker configuration
+├── docs/                    # Documentation
+├── .github/                 # GitHub workflows
+├── docker-compose.yml       # Development environment
+└── README.md                # This file
 ```
 
 ## Testing
 
-The project includes a comprehensive testing strategy:
+The project uses a comprehensive multi-level testing strategy:
 
-- **Unit Tests**: Test individual components in isolation
-- **Integration Tests**: Test component interactions
-- **End-to-End Tests**: Test complete user flows
-- **Frontend Tests**: Test React components and state
+### Running Tests
 
-Run the full test suite:
 ```bash
-# Backend tests
-docker-compose exec api pytest
+# Run all tests
+cd api
+python -m pytest
 
-# Frontend tests
-cd frontend && npm test
+# Run only unit tests (fast, no Docker required)
+python -m pytest tests/unit
+
+# Run only integration tests (requires Docker)
+python -m pytest tests/integration
+
+# Run tests with specific markers
+python -m pytest -m unit
+python -m pytest -m integration
+
+# Run specific test modules
+python -m pytest tests/unit/auth
+python -m pytest tests/integration/repositories
+```
+
+### Test Categories
+
+#### Unit Tests
+
+Unit tests focus on testing components in isolation without dependencies on external systems:
+- Use mocking to replace external dependencies
+- Very fast execution (milliseconds)
+- Don't require Docker or any infrastructure
+- Focus on correctness of individual components
+- Run frequently during development
+
+Example command:
+```bash
+cd api
+python -m pytest tests/unit
+```
+
+#### Integration Tests
+
+Integration tests verify how components work together using real infrastructure:
+- Use TestContainers to create ephemeral PostgreSQL and Redis instances
+- Each test gets a clean isolated environment
+- Containers are automatically created and destroyed
+- Require Docker to be running
+- Run less frequently, typically in CI/CD pipeline
+
+Example command:
+```bash
+cd api
+python -m pytest tests/integration
+```
+
+#### End-to-End Tests
+
+E2E tests verify complete user flows from frontend to backend:
+- Test the entire application as a black box
+- Require the full application stack to be running
+- Run least frequently, typically before releases
+
+Example command:
+```bash
+cd api
+python -m pytest tests/e2e
+```
+
+### Frontend Tests
+
+For frontend testing:
+
+```bash
+# Navigate to frontend directory
+cd frontend
+
+# Run tests
+npm test
 ```
 
 ## Contributing

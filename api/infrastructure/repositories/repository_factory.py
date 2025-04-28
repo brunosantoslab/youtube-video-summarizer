@@ -6,6 +6,7 @@ from domain.repositories.base_repository import IRepository
 from domain.repositories.user_repository import IUserRepository
 from domain.repositories.video_repository import IVideoRepository
 from domain.repositories.transcript_repository import ITranscriptRepository
+from domain.repositories.auth import IOAuthTokenRepository
 from infrastructure.repositories.user_repository import PostgresUserRepository
 from infrastructure.repositories.video_repository import PostgresVideoRepository
 from infrastructure.repositories.transcript_repository import PostgresTranscriptRepository
@@ -15,6 +16,7 @@ from domain.repositories.topic_repository import ITopicRepository
 from infrastructure.repositories.topic_repository import PostgresTopicRepository
 from domain.repositories.processing_repository import IProcessingRepository
 from infrastructure.repositories.processing_repository import PostgresProcessingRepository
+from infrastructure.repositories.auth import PostgresOAuthTokenRepository
 
 
 class RepositoryFactory:
@@ -28,7 +30,8 @@ class RepositoryFactory:
             ITranscriptRepository: PostgresTranscriptRepository,
             ISummaryRepository: PostgresSummaryRepository,
             ITopicRepository: PostgresTopicRepository,
-            IProcessingRepository: PostgresProcessingRepository,  # Added
+            IProcessingRepository: PostgresProcessingRepository,
+            IOAuthTokenRepository: PostgresOAuthTokenRepository,  # Added OAuth token repository
         }
         self._instances: Dict[Type[IRepository], IRepository] = {}
     

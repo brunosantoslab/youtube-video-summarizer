@@ -23,7 +23,7 @@ class TranscriptEntity(Base, BaseEntity):
     source_type = Column(SQLAEnum(TranscriptSourceType), nullable=False)
     language_code = Column(String, nullable=False)
     processing_status = Column(SQLAEnum(ProcessingStatus), nullable=False)
-    metadata = Column(JSONB, nullable=False)
+    transcript_metadata = Column(JSONB, nullable=False)
     
     @staticmethod
     def from_domain(transcript: Transcript) -> "TranscriptEntity":
@@ -38,7 +38,7 @@ class TranscriptEntity(Base, BaseEntity):
             source_type=transcript.source_type,
             language_code=transcript.language_code,
             processing_status=transcript.processing_status,
-            metadata=transcript.metadata.to_dict(),
+            transcript_metadata=transcript.metadata.to_dict(),
             date_created=transcript.date_created,
             date_modified=transcript.date_modified
         )
@@ -50,7 +50,7 @@ class TranscriptEntity(Base, BaseEntity):
             for segment_data in self.segments
         ] if self.segments else []
         
-        metadata = TranscriptMetadata.from_dict(self.metadata)
+        metadata = TranscriptMetadata.from_dict(self.transcript_metadata)
         
         return Transcript(
             id=self.id,

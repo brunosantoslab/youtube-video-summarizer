@@ -1,6 +1,5 @@
 # api/infrastructure/persistence/video_entity.py
-from sqlalchemy import Column, String, Enum as SQLAEnum, Interval
-from sqlalchemy.dialects.postgresql import DateTime
+from sqlalchemy import Column, String, Enum as SQLAEnum, Interval, DateTime
 
 from domain.models.video import Video, VideoStatus
 from infrastructure.persistence.base import Base, BaseEntity

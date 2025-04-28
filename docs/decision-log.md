@@ -116,6 +116,61 @@ This document tracks important architectural decisions made during the developme
   - Negative: Additional abstraction layer
 - **Alternatives Considered**: Direct ORM usage, active record pattern
 
+### [YVS-DL-048] Decoupled OAuth Authentication Service Implementation
+
+- **Date**: 2025-04-25
+- **Status**: Approved
+- **Context**: Need to implement secure and reliable authentication with YouTube API
+- **Decision**: Create decoupled authentication service with token encryption, refresh management, and session integration
+- **Consequences**: 
+  - Positive: Enhanced security, separation of concerns, easier maintenance, centralized auth management
+  - Negative: Additional complexity, potential for token refresh issues if not carefully implemented
+- **Alternatives Considered**: Direct client-side OAuth flow, simpler token storage solutions
+
+### [YVS-DL-049] Specialized YouTube API Clients Architecture
+
+- **Date**: 2025-04-25
+- **Status**: Approved
+- **Context**: Need a maintainable and flexible way to interact with various YouTube API endpoints
+- **Decision**: Implement specialized API client classes for different YouTube API domains (Channels, Videos, Captions)
+- **Consequences**: 
+  - Positive: Better organization of API calls, domain-specific error handling, focused responsibilities
+  - Negative: More classes to maintain, potential for duplication across clients
+- **Alternatives Considered**: Monolithic API client, function-based API wrappers
+
+### [YVS-DL-050] Comprehensive Exception Handling for API Requests
+
+- **Date**: 2025-04-25
+- **Status**: Approved
+- **Context**: Need robust error handling for external API calls to YouTube
+- **Decision**: Implement specialized exception types and comprehensive error handling strategies for YouTube API
+- **Consequences**: 
+  - Positive: Better error diagnostics, improved reliability, cleaner client code
+  - Negative: Additional complexity in exception hierarchy
+- **Alternatives Considered**: Generic exception handling, HTTP status code checking
+
+### [YVS-DL-051] Facade Service for YouTube API Operations
+
+- **Date**: 2025-04-25
+- **Status**: Approved
+- **Context**: Need to simplify usage of multiple YouTube API clients throughout the application
+- **Decision**: Create a comprehensive YouTubeAPIService that integrates all specialized clients under a single interface
+- **Consequences**: 
+  - Positive: Simplified high-level API for application services, more intuitive organization
+  - Negative: Additional layer in the architecture
+- **Alternatives Considered**: Direct usage of specialized clients, dependency injection of multiple clients
+
+### [YVS-DL-052] Transcript Extraction with Fallback Strategy
+
+- **Date**: 2025-04-25
+- **Status**: Approved
+- **Context**: Need reliable transcript extraction from YouTube videos
+- **Decision**: Implement multi-format transcript parsing with TTML and SRT support, along with fallback strategies
+- **Consequences**: 
+  - Positive: Higher success rate for transcript extraction, format flexibility, better error recovery
+  - Negative: More complex parsing logic, needs handling for different caption formats
+- **Alternatives Considered**: Single format support, external transcript extraction service
+
 ## AI/ML Decisions
 
 ### [YVS-DL-006] LangChain for Topic Extraction Workflows
@@ -341,6 +396,138 @@ This document tracks important architectural decisions made during the developme
   - Positive: Faster tests, more reliable execution, no external dependencies
   - Negative: Potential drift between mocks and actual services
 - **Alternatives Considered**: Integration tests against test environments, test doubles
+
+### [YVS-DL-053] Comprehensive Unit Testing for YouTube API Clients
+
+- **Date**: 2025-04-25
+- **Status**: Approved
+- **Context**: Need reliable testing for YouTube API integration with minimum external dependencies
+- **Decision**: Implement comprehensive unit tests with mock responses for YouTube API clients
+- **Consequences**: 
+  - Positive: Reliable tests, no dependency on external services, better coverage of edge cases
+  - Negative: Need to maintain mock response data, potential drift from actual API responses
+- **Alternatives Considered**: Integration tests against real YouTube API, simplified test coverage
+
+### [YVS-DL-056] TestContainers for Ephemeral Test Environments
+
+- **Date**: 2025-04-25
+- **Status**: Approved
+- **Context**: Need a more robust, isolated, and modern approach to integration testing
+- **Decision**: Migrate from script-based test setup to TestContainers for Python for automated, ephemeral container management
+- **Consequences**: 
+  - Positive: True isolation between test runs, improved test reliability, closer to production environment, code-driven infrastructure
+  - Negative: Learning curve, potentially slower test execution, additional dependency on Docker during testing
+- **Alternatives Considered**: Custom script-based automation, mock-based testing for databases, in-memory databases
+
+### [YVS-DL-057] Strictly Separated Testing Approaches
+
+- **Date**: 2025-04-25
+- **Status**: Approved
+- **Context**: Need clear differentiation between unit and integration tests to ensure optimal performance and reliability
+- **Decision**: Implement strict separation between unit tests (mock-based, no infrastructure) and integration tests (TestContainers)
+- **Consequences**: 
+  - Positive: Faster unit tests, clearer test intent, improved CI/CD pipeline performance, improved developer experience
+  - Negative: More complex test organization, need to maintain two separate testing approaches
+- **Alternatives Considered**: Universal TestContainers usage, in-memory databases for all tests
+
+### [YVS-DL-058] YouTube API and Repository Interface Alignment
+
+- **Date**: 2025-04-25
+- **Status**: Approved
+- **Context**: Field name mismatches and architectural inconsistencies were causing test failures
+- **Decision**: Align field names across repositories, entities, and services and improve error handling in API integrations
+- **Consequences**: 
+  - Positive: More consistent codebase, fewer bugs, better testability, and more predictable behavior
+  - Negative: Temporary refactoring overhead, potential for regressions in untested areas
+- **Alternatives Considered**: Creating adapter methods, renaming database fields
+
+### [YVS-DL-059] Robust Error Handling in API Services
+
+- **Date**: 2025-04-25
+- **Status**: Approved
+- **Context**: Need to improve error handling in API services to increase reliability and diagnosability
+- **Decision**: Implement comprehensive try-catch blocks with consistent error logging and safe return values
+- **Consequences**: 
+  - Positive: Higher service resilience, better debugging capabilities, more predictable error states
+  - Negative: More complex service methods, slightly increased code size
+- **Alternatives Considered**: Global error handlers, letting exceptions propagate upward
+
+### [YVS-DL-060] Enhanced Unit Test Reliability
+
+- **Date**: 2025-04-25
+- **Status**: Approved
+- **Context**: Unit tests were failing due to issues with mocking complex objects and asynchronous operations
+- **Decision**: Implement more robust mocking patterns and proper async function handling in tests
+- **Consequences**: 
+  - Positive: More reliable tests, fewer false negatives, better test maintenance
+  - Negative: More complex test setup, slightly increased test code size
+- **Alternatives Considered**: Integration testing instead of unit testing, simplified service interfaces
+
+### [YVS-DL-061] Test Mocking Best Practices
+
+- **Date**: 2025-04-25
+- **Status**: Approved
+- **Context**: Unit tests were failing due to improper mocking of methods and missing imports
+- **Decision**: Implement consistent mocking patterns with proper teardown and cleanup
+- **Consequences**: 
+  - Positive: More reliable tests, better isolation between test cases, proper cleanup of resources
+  - Negative: Slightly more complex test setup, but with better maintainability
+- **Alternatives Considered**: Global mocks without cleanup, testing with real implementations
+
+### [YVS-DL-062] Isolated Test Service Instances
+
+- **Date**: 2025-04-25
+- **Status**: Approved
+- **Context**: Test failures occurred when trying to mock and test service methods while preserving the original functionality
+- **Decision**: Create isolated service instances specifically for tests that need to test the actual implementation
+- **Consequences**: 
+  - Positive: Completely isolated tests, no side effects between tests, more reliable test execution
+  - Negative: Slightly more verbose test setup, need to duplicate service initialization
+- **Alternatives Considered**: Method restoration with try/finally blocks, state-preserving patches
+
+### [YVS-DL-063] Database Entity Import Path Standardization
+
+- **Date**: 2025-04-26
+- **Status**: Approved
+- **Context**: Test failures occurred due to import path mismatches and missing dependencies
+- **Decision**: Standardize entity import paths, fix DateTime import, and add setuptools dependency for distutils
+- **Consequences**: 
+  - Positive: Fixed test failures, more consistent import paths, proper SQLAlchemy type usage
+  - Negative: Small adjustments to existing code patterns
+- **Alternatives Considered**: Moving entities to match the incorrect import paths, using PostgreSQL-specific types
+
+### [YVS-DL-064] Python 3.12 Compatibility Fixes
+
+- **Date**: 2025-04-26
+- **Status**: Approved
+- **Context**: Several test failures occurred due to incompatibility issues with Python 3.12, including reserved keywords, import errors, and duplicate class inheritance
+- **Decision**: Implement multiple fixes including: renaming 'metadata' field to avoid SQLAlchemy reserved keyword conflicts, fixing JSONB imports, addressing repository naming inconsistencies, and updating Redis async implementation to be compatible with Python 3.12
+- **Consequences**: 
+  - Positive: Fixed test failures, improved Python 3.12 compatibility, more maintainable codebase
+  - Negative: Breaking changes requiring database migrations, dependency updates
+- **Alternatives Considered**: Downgrading to Python 3.11, using different ORM libraries, creating compatibility wrappers
+
+### [YVS-DL-065] Environment-Based Configuration for Local Development
+
+- **Date**: 2025-04-26
+- **Status**: Approved
+- **Context**: Development and testing needed a way to use Neon PostgreSQL outside of Docker containers
+- **Decision**: Create separate environment file (.env.local) for running with remote Neon PostgreSQL
+- **Consequences**: 
+  - Positive: Ability to run migrations and tests without Docker, simplified local development
+  - Negative: Need to manually switch environment files when changing contexts
+- **Alternatives Considered**: Local PostgreSQL installation, Docker-only development
+
+### [YVS-DL-066] Migration Sequence Correction
+
+- **Date**: 2025-04-26
+- **Status**: Approved
+- **Context**: Migration failure due to missing database tables and incorrect migration dependencies
+- **Decision**: Create migrations for missing tables (users, videos, transcripts) and fix migration sequence, using shorter revision IDs to comply with database limitations
+- **Consequences**: 
+  - Positive: Proper database initialization with correct table dependencies
+  - Negative: Manual intervention required in migration sequence
+- **Alternatives Considered**: Modifying existing migrations, skipping foreign key constraints
 
 ## Infrastructure Decisions
 

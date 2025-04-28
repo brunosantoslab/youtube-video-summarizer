@@ -14,6 +14,7 @@ alembic>=1.11.1          # Added for database migrations
 python-jose>=3.3.0
 passlib>=1.7.4
 python-multipart>=0.0.6
+cryptography>=41.0.0     # Added for encryption
 
 # External services
 httpx>=0.24.0
@@ -34,13 +35,21 @@ tiktoken>=0.5.0           # Added for token counting and optimization
 
 # Background tasks
 celery>=5.3.0
-redis>=4.5.5
+redis>=4.5.5  # Redis 4.3.0+ includes asyncio functionality
 
 # Testing
 pytest>=7.3.1
 pytest-asyncio>=0.21.0
 pytest-cov>=4.1.0
 pytest-mock>=3.10.0
+testcontainers>=2.0.0     # TestContainers core package
+pytest-xdist>=3.3.1       # Added for parallel test execution
+pytest-sugar>=0.9.7       # Added for better test reporting
+# aioredis>=2.0.0           # Removed in favor of redis-py-asyncio
+setuptools>=68.0.0        # Added for distutils dependency
+
+# Platform-specific dependencies
+pysqlite3>=0.5.0; sys_platform == "linux"  # SQLite support for Linux/WSL only
 
 # Utils
 python-dotenv>=1.0.0

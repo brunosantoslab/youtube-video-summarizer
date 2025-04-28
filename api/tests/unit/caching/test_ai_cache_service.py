@@ -1,4 +1,7 @@
-# api/tests/unit/caching/test_ai_cache_service.py
+"""
+Unit tests for the AI Cache Service
+Author: Bruno Santos
+"""
 import pytest
 import json
 from unittest.mock import patch, MagicMock, AsyncMock, call

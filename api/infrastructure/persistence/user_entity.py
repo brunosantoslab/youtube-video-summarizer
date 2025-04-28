@@ -1,7 +1,9 @@
 # api/infrastructure/persistence/user_entity.py
-from sqlalchemy import Column, String, Boolean, Integer, JSON
+from sqlalchemy import Column, String, Boolean, Integer, JSON, DateTime
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 import uuid
+from datetime import datetime
 
 from domain.models.user import User, UserPreferences
 from infrastructure.persistence.base import Base, BaseEntity
@@ -25,7 +27,7 @@ class UserEntity(Base, BaseEntity):
             email=user.email,
             youtube_user_id=user.youtube_user_id,
             display_name=user.display_name,
-            preferences_json=user.preference_settings.to_dict(),
+            preferences_json=user.preference_settings.to_dict() if user.preference_settings else {},
             date_created=user.date_created,
             date_modified=user.date_modified
         )
@@ -37,7 +39,7 @@ class UserEntity(Base, BaseEntity):
             email=self.email,
             youtube_user_id=self.youtube_user_id,
             display_name=self.display_name,
-            preference_settings=UserPreferences.from_dict(self.preferences_json),
+            preference_settings=UserPreferences.from_dict(self.preferences_json or {}),
             date_created=self.date_created,
             date_modified=self.date_modified
         )

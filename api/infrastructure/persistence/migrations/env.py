@@ -18,8 +18,9 @@ config = context.config
 from config import get_settings
 settings = get_settings()
 
-# Override the database URL with our configuration
-config.set_main_option("sqlalchemy.url", settings.database_url)
+# Directly set the database URL to Neon PostgreSQL
+# This avoids any environment variable issues
+config.set_main_option("sqlalchemy.url", "postgresql://neondb_owner:npg_PS0NT6DzdvRn@ep-lingering-cloud-acvjfrnh-pooler.sa-east-1.aws.neon.tech/summary_tube_db?sslmode=require")
 
 # Interpret the config file for Python logging
 if config.config_file_name is not None:

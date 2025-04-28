@@ -1,4 +1,7 @@
-# api/tests/unit/services/test_transcription_service.py
+"""
+Unit tests for the Transcription Service
+Author: Bruno Santos
+"""
 import uuid
 from unittest.mock import AsyncMock, MagicMock, patch
 
