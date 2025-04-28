@@ -1,4 +1,7 @@
-# api/tests/unit/external/ai/test_token_optimizer.py
+"""
+Unit tests for the Token Optimizer
+Author: Bruno Santos
+"""
 import pytest
 from unittest.mock import patch, MagicMock
 import tiktoken

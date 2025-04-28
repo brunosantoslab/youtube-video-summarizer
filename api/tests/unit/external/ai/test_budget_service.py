@@ -1,4 +1,7 @@
-# api/tests/unit/external/ai/test_budget_service.py
+"""
+Unit tests for the AI Budget Service
+Author: Bruno Santos
+"""
 import pytest
 from unittest.mock import patch, MagicMock, AsyncMock
 import json

@@ -1,4 +1,7 @@
-# api/tests/unit/services/test_summary_generation_service.py
+"""
+Unit tests for the Summary Generation Service
+Author: Bruno Santos
+"""
 import uuid
 from unittest.mock import AsyncMock, MagicMock, patch
 

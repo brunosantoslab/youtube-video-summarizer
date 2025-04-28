@@ -1,5 +1,6 @@
 # api/infrastructure/persistence/summary_entity.py
-from sqlalchemy import Column, String, ForeignKey, JSONB
+from sqlalchemy import Column, String, ForeignKey, JSON
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID
 
 from domain.models.summary import Summary, SummaryMetadata

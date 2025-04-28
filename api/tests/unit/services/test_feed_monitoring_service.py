@@ -1,4 +1,7 @@
-# api/tests/unit/services/test_feed_monitoring_service.py
+"""
+Unit tests for the feed monitoring service
+Author: Bruno Santos
+"""
 import uuid
 from datetime import timedelta
 from unittest.mock import AsyncMock, MagicMock, patch

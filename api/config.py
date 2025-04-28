@@ -1,6 +1,6 @@
 # api/config.py
 from functools import lru_cache
-from typing import Optional, Dict
+from typing import Optional, Dict, Any
 
 from pydantic_settings import BaseSettings
 
@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     ai_prompt_optimization_enabled: bool = True
     
     # AI Provider costs per 1K tokens (input/output) in USD
-    ai_provider_costs: Dict[str, Dict[str, float]] = {
+    ai_provider_costs: Dict[str, Dict[str, Dict[str, float]]] = {
         "openai": {
             "gpt-4": {"input": 0.03, "output": 0.06},
             "gpt-3.5-turbo": {"input": 0.0015, "output": 0.002}
@@ -51,9 +51,17 @@ class Settings(BaseSettings):
     
     class Config:
         env_file = ".env"
+        arbitrary_types_allowed = True
 
 
 @lru_cache()
 def get_settings() -> Settings:
     """Get application settings"""
     return Settings()
+
+@lru_cache()
+def get_neon_settings() -> Settings:
+    """Get application settings with Neon database"""
+    settings = Settings(_env_file="../.env.local")
+    print(f"Loading settings from ../.env.local with database URL: {settings.database_url}")
+    return settings

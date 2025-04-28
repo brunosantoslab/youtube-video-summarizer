@@ -10,6 +10,8 @@ from fastapi.openapi.utils import get_openapi
 
 from config import get_settings
 from presentation.routes.ai_optimization_routes import router as ai_optimization_router
+from presentation.routes.auth import youtube_auth_router
+from presentation.routes.youtube import youtube_feed_router
 
 # Set up logging
 logging.basicConfig(
@@ -43,6 +45,8 @@ app.add_middleware(
 
 # Include routers
 app.include_router(ai_optimization_router)
+app.include_router(youtube_auth_router)
+app.include_router(youtube_feed_router)
 
 # Custom exception handler
 @app.exception_handler(Exception)
