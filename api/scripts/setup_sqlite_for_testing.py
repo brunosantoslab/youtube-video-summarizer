@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Script para configurar o ambiente de teste em ambientes sem suporte nativo a SQLite.
-Este script deve ser executado antes dos testes quando o Python não tiver o módulo _sqlite3.
+Script to configure the test environment in environments without native SQLite support.
+This script should be executed before tests when Python doesn't have the _sqlite3 module.
 
-Autor: Bruno Santos
+Author: Bruno Santos
 """
 import sys
 import os
@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 def check_sqlite3():
-    """Verifica se o módulo sqlite3 está disponível e funcionando."""
+    """Checks if the sqlite3 module is available and working."""
     try:
         import sqlite3
         logger.info(f"SQLite3 module found: {sqlite3.__file__}")
@@ -29,7 +29,7 @@ def check_sqlite3():
         return False
 
 def check_pysqlite3():
-    """Verifica se o módulo pysqlite3 está disponível."""
+    """Checks if the pysqlite3 module is available."""
     if importlib.util.find_spec("pysqlite3"):
         logger.info("pysqlite3 module found")
         return True
@@ -38,7 +38,7 @@ def check_pysqlite3():
         return False
 
 def install_pysqlite3():
-    """Instala o pacote pysqlite3."""
+    """Installs the pysqlite3 package."""
     try:
         logger.info("Installing pysqlite3...")
         subprocess.check_call([sys.executable, "-m", "pip", "install", "pysqlite3"])
@@ -49,7 +49,7 @@ def install_pysqlite3():
         return False
 
 def create_patched_coverage_file():
-    """Cria um arquivo de inicialização para substituir sqlite3 nos testes de coverage."""
+    """Creates an initialization file to replace sqlite3 in coverage tests."""
     patch_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "coverage_sqlite_patch.py")
     
     content = """#!/usr/bin/env python3
@@ -72,7 +72,7 @@ except Exception as e:
     logger.info(f"Created SQLite patch file at {patch_file}")
     logger.info("To use it, run: python -m scripts.coverage_sqlite_patch -m pytest ...")
     
-    # Tornar o arquivo executável em sistemas Unix
+    # Make the file executable on Unix systems
     try:
         os.chmod(patch_file, 0o755)
     except:
@@ -81,7 +81,7 @@ except Exception as e:
     return patch_file
 
 def main():
-    """Função principal."""
+    """Main function."""
     logger.info("Checking SQLite setup for testing...")
     
     if check_sqlite3():

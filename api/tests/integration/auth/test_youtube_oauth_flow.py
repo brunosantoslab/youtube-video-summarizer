@@ -3,9 +3,6 @@ Integration tests for YouTube OAuth flow using TestContainers
 Author: Bruno Santos
 """
 import pytest
-from httpx import AsyncClient
-import uuid
-from sqlalchemy.orm import Session
 
 from domain.models.user import User
 from domain.repositories.user_repository import IUserRepository

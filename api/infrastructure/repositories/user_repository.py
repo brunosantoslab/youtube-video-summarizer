@@ -1,5 +1,5 @@
 # api/infrastructure/repositories/user_repository.py
-from typing import Optional
+from typing import Optional, List
 
 from sqlalchemy.orm import Session
 
@@ -22,4 +22,7 @@ class PostgresUserRepository(SQLAlchemyRepository[User, UserEntity], IUserReposi
     def get_by_email(self, email: str) -> Optional[User]:
         entity = self.session.query(UserEntity).filter(UserEntity.email == email).first()
         return entity.to_domain() if entity else None
-        
+    
+    def get_all(self) -> List[User]:
+        """Get all users"""
+        return self.list()

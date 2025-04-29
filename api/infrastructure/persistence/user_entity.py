@@ -17,7 +17,7 @@ class UserEntity(Base, BaseEntity):
     email = Column(String, unique=True, nullable=False)
     youtube_user_id = Column(String, unique=True, nullable=False)
     display_name = Column(String, nullable=False)
-    preferences_json = Column(JSON, nullable=False, default=dict)
+    settings = Column(JSON, nullable=True, default=dict)
     
     @staticmethod
     def from_domain(user: User) -> "UserEntity":
@@ -27,7 +27,7 @@ class UserEntity(Base, BaseEntity):
             email=user.email,
             youtube_user_id=user.youtube_user_id,
             display_name=user.display_name,
-            preferences_json=user.preference_settings.to_dict() if user.preference_settings else {},
+            settings=user.preference_settings.to_dict() if user.preference_settings else {},
             date_created=user.date_created,
             date_modified=user.date_modified
         )
@@ -39,7 +39,7 @@ class UserEntity(Base, BaseEntity):
             email=self.email,
             youtube_user_id=self.youtube_user_id,
             display_name=self.display_name,
-            preference_settings=UserPreferences.from_dict(self.preferences_json or {}),
+            preference_settings=UserPreferences.from_dict(self.settings or {}),
             date_created=self.date_created,
             date_modified=self.date_modified
         )
