@@ -13,7 +13,62 @@ This document tracks important architectural decisions made during the developme
 
 ## Architecture Decisions
 
-### [YVS-DL-001] Clean Architecture with DDD and Anemic Domain Model
+### [YVS-DL-018] Event-Driven Communication Between Services
+
+- **Date**: 2025-04-22
+- **Status**: Approved
+- **Context**: Need to coordinate complex workflows across services
+- **Decision**: Implement event-driven communication between application services using domain events
+- **Consequences**: 
+  - Positive: Decoupled services, extensible architecture, better resilience
+  - Negative: More complex debugging, potential for missed events
+- **Alternatives Considered**: Direct service calls, shared state
+
+## Documentation Decisions
+
+### [YVS-DL-069] Comprehensive Documentation Approach
+
+- **Date**: 2025-04-29
+- **Status**: Approved
+- **Context**: Need to complete technical documentation and user guides for the project as part of YVS-19
+- **Decision**: Create comprehensive documentation including user flows, API routes, component flow diagrams, and architecture diagrams
+- **Consequences**: 
+  - Positive: Better knowledge transfer, easier onboarding for new developers, clear system understanding
+  - Negative: Documentation maintenance overhead, need to keep in sync with code changes
+- **Alternatives Considered**: Minimal documentation, code-only documentation, automated documentation generation
+
+### [YVS-DL-070] Mermaid Diagrams for Technical Documentation
+
+- **Date**: 2025-04-29
+- **Status**: Approved
+- **Context**: Need visual representations of system architecture and flows
+- **Decision**: Use Mermaid diagram syntax for all technical diagrams in markdown documentation
+- **Consequences**: 
+  - Positive: Version-controllable diagrams, easy to modify, renders directly in GitHub/GitLab
+  - Negative: Limited styling options, potential rendering issues in some markdown viewers
+- **Alternatives Considered**: PlantUML, draw.io diagrams, static image diagrams
+
+### [YVS-DL-071] API Routes Documentation Standardization
+
+- **Date**: 2025-04-29
+- **Status**: Approved
+- **Context**: Need standardized documentation for all API endpoints
+- **Decision**: Create comprehensive API routes documentation with standardized format for endpoints, parameters, and responses
+- **Consequences**: 
+  - Positive: Easier API consumption, better developer experience, clear contract between frontend and backend
+  - Negative: Documentation maintenance overhead, need to update with each API change
+- **Alternatives Considered**: OpenAPI/Swagger auto-generation, minimal endpoint documentation, separate documentation per endpoint
+
+### [YVS-DL-072] User-Centric Flow Documentation
+
+- **Date**: 2025-04-29
+- **Status**: Approved
+- **Context**: Need to document key user interactions and flows through the system
+- **Decision**: Create user flow documentation with sequence diagrams showing interactions between user, frontend, and backend
+- **Consequences**: 
+  - Positive: Better understanding of user experience, clear visualization of system behavior from user perspective
+  - Negative: Additional documentation to maintain, potential disconnect with implementation details
+- **Alternatives Considered**: Screen mockups only, text-based user journey documentationL-001] Clean Architecture with DDD and Anemic Domain Model
 
 - **Date**: 2025-04-22
 - **Status**: Approved
@@ -629,6 +684,98 @@ This document tracks important architectural decisions made during the developme
   - Positive: Loose coupling between services, better scalability
   - Negative: More complex to debug, potential message delivery issues
 - **Alternatives Considered**: Direct service calls, database polling
+
+### [YVS-DL-034] Task Organization
+
+- **Date**: 2025-04-23
+- **Status**: Approved
+- **Context**: Need to organize background tasks in a maintainable way
+- **Decision**: Create a dedicated 'tasks' module for all Celery background tasks
+- **Consequences**: 
+  - Positive: Clear organization of background tasks, separation from domain/application logic
+  - Negative: Additional layer in the architecture
+- **Alternatives Considered**: Including tasks within application services, infrastructure layer
+
+## Application Layer Decisions
+
+### [YVS-DL-016] Service-Oriented Application Layer
+
+- **Date**: 2025-04-22
+- **Status**: Approved
+- **Context**: Need to orchestrate complex domain operations and external services
+- **Decision**: Implement service-oriented application layer with specialized services for each major function
+- **Consequences**: 
+  - Positive: Clear separation of concerns, focused services with single responsibilities
+  - Negative: Potential for service proliferation, need for careful dependency management
+- **Alternatives Considered**: Monolithic application service, command/query handlers only
+
+### [YVS-DL-017] DTOs for Input/Output Boundary
+
+- **Date**: 2025-04-22
+- **Status**: Approved
+- **Context**: Need to define clear boundaries between layers
+- **Decision**: Use Data Transfer Objects (DTOs) for all inputs to and outputs from application services
+- **Consequences**: 
+  - Positive: Explicit contracts, decoupled from domain entities, easier API versioning
+  - Negative: Additional mapping code, potential for duplication
+- **Alternatives Considered**: Direct entity passing, dynamic object usage
+
+### [YVS-DL-018] Event-Driven Communication Between Services
+
+- **Date**: 2025-04-22
+- **Status**: Approved
+- **Context**: Need to coordinate complex workflows across services
+- **Decision**: Implement event-driven communication between application services using domain events
+- **Consequences**: 
+  - Positive: Decoupled services, extensible architecture, better resilience
+  - Negative: More complex debugging, potential for missed events
+- **Alternatives Considered**: Direct service calls, shared state
+
+## Documentation Decisions
+
+### [YVS-DL-069] Comprehensive Documentation Approach
+
+- **Date**: 2025-04-29
+- **Status**: Approved
+- **Context**: Need to complete technical documentation and user guides for the project as part of YVS-19
+- **Decision**: Create comprehensive documentation including user flows, API routes, component flow diagrams, and architecture diagrams
+- **Consequences**: 
+  - Positive: Better knowledge transfer, easier onboarding for new developers, clear system understanding
+  - Negative: Documentation maintenance overhead, need to keep in sync with code changes
+- **Alternatives Considered**: Minimal documentation, code-only documentation, automated documentation generation
+
+### [YVS-DL-070] Mermaid Diagrams for Technical Documentation
+
+- **Date**: 2025-04-29
+- **Status**: Approved
+- **Context**: Need visual representations of system architecture and flows
+- **Decision**: Use Mermaid diagram syntax for all technical diagrams in markdown documentation
+- **Consequences**: 
+  - Positive: Version-controllable diagrams, easy to modify, renders directly in GitHub/GitLab
+  - Negative: Limited styling options, potential rendering issues in some markdown viewers
+- **Alternatives Considered**: PlantUML, draw.io diagrams, static image diagrams
+
+### [YVS-DL-071] API Routes Documentation Standardization
+
+- **Date**: 2025-04-29
+- **Status**: Approved
+- **Context**: Need standardized documentation for all API endpoints
+- **Decision**: Create comprehensive API routes documentation with standardized format for endpoints, parameters, and responses
+- **Consequences**: 
+  - Positive: Easier API consumption, better developer experience, clear contract between frontend and backend
+  - Negative: Documentation maintenance overhead, need to update with each API change
+- **Alternatives Considered**: OpenAPI/Swagger auto-generation, minimal endpoint documentation, separate documentation per endpoint
+
+### [YVS-DL-072] User-Centric Flow Documentation
+
+- **Date**: 2025-04-29
+- **Status**: Approved
+- **Context**: Need to document key user interactions and flows through the system
+- **Decision**: Create user flow documentation with sequence diagrams showing interactions between user, frontend, and backend
+- **Consequences**: 
+  - Positive: Better understanding of user experience, clear visualization of system behavior from user perspective
+  - Negative: Additional documentation to maintain, potential disconnect with implementation details
+- **Alternatives Considered**: Screen mockups only, text-based user journey documentation database polling
 
 ### [YVS-DL-034] Task Organization
 
