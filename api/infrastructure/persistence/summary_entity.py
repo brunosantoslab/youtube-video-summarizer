@@ -21,13 +21,17 @@ class SummaryEntity(Base, BaseEntity):
     @staticmethod
     def from_domain(summary: Summary) -> "SummaryEntity":
         """Convert domain entity to ORM entity"""
+        # Correctly handle processing_metadata, which might be a SummaryMetadata object or a dict
+        metadata = summary.processing_metadata
+        metadata_dict = metadata.to_dict() if hasattr(metadata, 'to_dict') else metadata
+        
         return SummaryEntity(
             id=summary.id,
             video_id=summary.video_id,
             content=summary.content,
             model_provider=summary.model_provider,
             model_version=summary.model_version,
-            processing_metadata=summary.processing_metadata.to_dict(),
+            processing_metadata=metadata_dict,
             date_created=summary.date_created,
             date_modified=summary.date_modified
         )

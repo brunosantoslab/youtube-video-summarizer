@@ -529,6 +529,28 @@ This document tracks important architectural decisions made during the developme
   - Negative: Manual intervention required in migration sequence
 - **Alternatives Considered**: Modifying existing migrations, skipping foreign key constraints
 
+### [YVS-DL-067] Additional Database Schema Tables
+
+- **Date**: 2025-04-26
+- **Status**: Approved
+- **Context**: Need for additional tables to support already implemented functionalities
+- **Decision**: Create migrations for tables: processing_tasks, summaries, saved_summaries, topics, ai_cache and ai_usage
+- **Consequences**: 
+  - Positive: Complete database support for all implemented functionalities
+  - Negative: Greater complexity of the database schema to maintain
+- **Alternatives Considered**: Storage in Redis for temporary data, JSON in existing columns
+
+### [YVS-DL-068] Enhanced Test Configuration for Non-Docker Environments
+
+- **Date**: 2025-04-29
+- **Status**: Approved
+- **Context**: Testing without Docker was failing due to the system trying to connect to Docker Engine even when configured to run with Neon PostgreSQL
+- **Decision**: Refactor the conftest.py file to properly handle both Docker and non-Docker testing environments using environment variables
+- **Consequences**: 
+  - Positive: More robust testing infrastructure, ability to run tests in environments without Docker, simpler test configuration
+  - Negative: Additional complexity in test fixtures, need to maintain dual configuration paths
+- **Alternatives Considered**: Separate test suites for Docker and non-Docker environments, manual mocking of container classes
+
 ## Infrastructure Decisions
 
 ### [YVS-DL-010] Docker-based Development and Deployment

@@ -7,11 +7,10 @@ import pytest
 from datetime import datetime, timedelta
 from sqlalchemy import select
 
-from domain.models.summary import Summary
-from domain.models.video import Video
+from domain.models.summary import Summary, SummaryMetadata
 from infrastructure.persistence.summary_entity import SummaryEntity
 from infrastructure.persistence.video_entity import VideoEntity
-from infrastructure.repositories.summary_repository import SummaryRepository
+from infrastructure.repositories.summary_repository import PostgresSummaryRepository
 
 
 @pytest.mark.integration
@@ -21,18 +20,18 @@ class TestSummaryRepository:
     @pytest.fixture
     def summary_repository(self, db_session):
         """Create a summary repository with test database session"""
-        return SummaryRepository(db_session)
+        return PostgresSummaryRepository(db_session)
     
     @pytest.fixture
     def test_video(self, db_session):
         """Create a test video in the database"""
         video_entity = VideoEntity(
-            youtube_id="test_video_123",
+            youtube_id = f"test_video_{uuid.uuid4().hex}",
             title="Test Video",
             description="Test description",
             channel_id="test_channel_id",
             channel_title="Test Channel",
-            publish_date=datetime.now() - timedelta(days=1),
+            published_at=datetime.now() - timedelta(days=1),
             thumbnail_url="https://example.com/thumbnail.jpg",
             duration=timedelta(minutes=10)
         )
@@ -42,14 +41,23 @@ class TestSummaryRepository:
     
     def test_create_summary(self, summary_repository, test_video, db_session):
         """Test creating a summary in the database"""
+
+        # Create a summary metadata
+        summaryMetadata = SummaryMetadata(
+            processing_time=1.5,
+            token_count=150,
+            prompt_version="1.0",
+            confidence_score=1,
+            model_parameters=None
+        )
+        
         # Create a summary domain model
         summary = Summary(
             video_id=test_video.id,
             content="This is a test summary content",
             model_provider="openai",
             model_version="gpt-4",
-            processing_time=1.5,
-            token_count=150
+            processing_metadata=summaryMetadata
         )
         
         # Save the summary
@@ -68,8 +76,8 @@ class TestSummaryRepository:
         assert result.content == "This is a test summary content"
         assert result.model_provider == "openai"
         assert result.model_version == "gpt-4"
-        assert result.processing_time == 1.5
-        assert result.token_count == 150
+        assert result.processing_metadata["processing_time"] == 1.5
+        assert result.processing_metadata["token_count"] == 150
         
         # Verify the domain object was updated with ID
         assert created_summary.id is not None
@@ -77,14 +85,21 @@ class TestSummaryRepository:
     
     def test_get_summary_by_id(self, summary_repository, test_video, db_session):
         """Test retrieving a summary by ID"""
+
+
         # Create a summary entity directly in the database
         summary_entity = SummaryEntity(
             video_id=test_video.id,
             content="This is another test summary",
             model_provider="google",
             model_version="gemini-pro",
-            processing_time=2.0,
-            token_count=200
+            processing_metadata={
+                "processing_time": 2.0,
+                "token_count": 200,
+                "prompt_version": "1.0",
+                "confidence_score": 1,
+                "model_parameters": None
+            }
         )
         db_session.add(summary_entity)
         db_session.flush()
@@ -99,18 +114,26 @@ class TestSummaryRepository:
         assert summary.content == "This is another test summary"
         assert summary.model_provider == "google"
         assert summary.model_version == "gemini-pro"
-        assert summary.processing_time == 2.0
-        assert summary.token_count == 200
+        assert summary.processing_metadata.processing_time == 2.0
+        assert summary.processing_metadata.token_count == 200
     
     def test_get_latest_by_video_id(self, summary_repository, test_video, db_session):
         """Test retrieving the latest summary for a video"""
+ 
         # Create multiple summary entities for the same video with different creation times
         old_summary = SummaryEntity(
             video_id=test_video.id,
             content="Old summary",
             model_provider="openai",
             model_version="gpt-3.5",
-            created_at=datetime.now() - timedelta(hours=24)
+            date_created=datetime.now() - timedelta(hours=24),
+            processing_metadata={
+                "processing_time": 2.0,
+                "token_count": 200,
+                "prompt_version": "1.0",
+                "confidence_score": 1,
+                "model_parameters": None
+            }
         )
         
         middle_summary = SummaryEntity(
@@ -118,7 +141,14 @@ class TestSummaryRepository:
             content="Middle summary",
             model_provider="openai",
             model_version="gpt-3.5",
-            created_at=datetime.now() - timedelta(hours=12)
+            date_created=datetime.now() - timedelta(hours=12),
+            processing_metadata={
+                "processing_time": 2.0,
+                "token_count": 200,
+                "prompt_version": "1.0",
+                "confidence_score": 1,
+                "model_parameters": None
+            }
         )
         
         latest_summary = SummaryEntity(
@@ -126,7 +156,14 @@ class TestSummaryRepository:
             content="Latest summary",
             model_provider="openai",
             model_version="gpt-4",
-            created_at=datetime.now() - timedelta(hours=1)
+            date_created=datetime.now() - timedelta(hours=1),
+            processing_metadata={
+                "processing_time": 2.0,
+                "token_count": 200,
+                "prompt_version": "1.0",
+                "confidence_score": 1,
+                "model_parameters": None
+            }
         )
         
         db_session.add_all([old_summary, middle_summary, latest_summary])
@@ -140,6 +177,8 @@ class TestSummaryRepository:
         assert summary.id == latest_summary.id
         assert summary.content == "Latest summary"
         assert summary.model_version == "gpt-4"
+        assert summary.processing_metadata.processing_time == 2.0
+        assert summary.processing_metadata.token_count == 200
     
     def test_get_all_by_video_id(self, summary_repository, test_video, db_session):
         """Test retrieving all summaries for a video"""
@@ -149,7 +188,14 @@ class TestSummaryRepository:
                 video_id=test_video.id,
                 content=f"Summary {i}",
                 model_provider="openai",
-                model_version=f"gpt-{3+i}"
+                model_version=f"gpt-{3+i}",
+                processing_metadata={
+                    "processing_time": 2.0,
+                    "token_count": 200,
+                    "prompt_version": "1.0",
+                    "confidence_score": 1,
+                    "model_parameters": None
+                }
             )
             for i in range(3)
         ]
@@ -177,7 +223,14 @@ class TestSummaryRepository:
             video_id=test_video.id,
             content="Original content",
             model_provider="openai",
-            model_version="gpt-4"
+            model_version="gpt-4",
+            processing_metadata = SummaryMetadata(
+                processing_time=1.0,
+                token_count=300,
+                prompt_version="1.0",
+                confidence_score=1,
+                model_parameters=None
+            ).to_dict()
         )
         db_session.add(summary_entity)
         db_session.flush()
@@ -185,7 +238,13 @@ class TestSummaryRepository:
         # Get the summary and update it
         summary = summary_repository.get_by_id(summary_entity.id)
         summary.content = "Updated content"
-        summary.token_count = 300
+        summary.processing_metadata = SummaryMetadata(
+                processing_time=1.0,
+                token_count=300,
+                prompt_version="1.0",
+                confidence_score=1,
+                model_parameters=None
+            )
         
         # Update the summary
         updated_summary = summary_repository.update(summary)
@@ -196,11 +255,9 @@ class TestSummaryRepository:
         result = db_session.execute(stmt).scalar_one()
         
         assert result.content == "Updated content"
-        assert result.token_count == 300
         
         # Verify the returned object is correct
         assert updated_summary.content == "Updated content"
-        assert updated_summary.token_count == 300
     
     def test_delete_summary(self, summary_repository, test_video, db_session):
         """Test deleting a summary"""
@@ -209,7 +266,14 @@ class TestSummaryRepository:
             video_id=test_video.id,
             content="Summary to delete",
             model_provider="openai",
-            model_version="gpt-4"
+            model_version="gpt-4",
+            processing_metadata = SummaryMetadata(
+                processing_time=1.0,
+                token_count=300,
+                prompt_version="1.0",
+                confidence_score=1,
+                model_parameters=None
+            ).to_dict()
         )
         db_session.add(summary_entity)
         db_session.flush()

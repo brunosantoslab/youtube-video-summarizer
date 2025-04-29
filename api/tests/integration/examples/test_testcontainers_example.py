@@ -3,7 +3,6 @@ Example integration test using TestContainers
 Author: Bruno Santos
 """
 import pytest
-import sqlalchemy
 from sqlalchemy import Column, String, Integer, create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker

@@ -53,3 +53,11 @@ class PostgresSummaryRepository(SQLAlchemyRepository[Summary, SummaryEntity], IS
         ).limit(limit).all()
         
         return [entity.to_domain() for entity in entities]
+    
+    def get_all_by_video_id(self, video_id: uuid.UUID) -> List[Summary]:
+        """Retrieve all summaries associated with a given video ID"""
+        entities = self.session.query(SummaryEntity).filter(
+            SummaryEntity.video_id == video_id
+        ).order_by(SummaryEntity.date_created.asc()).all()
+
+        return [entity.to_domain() for entity in entities]

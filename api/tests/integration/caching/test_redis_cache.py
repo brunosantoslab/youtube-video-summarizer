@@ -4,9 +4,7 @@ Author: Bruno Santos
 """
 import json
 import pytest
-import redis.asyncio as redis_async
 import asyncio
-from datetime import timedelta
 
 from infrastructure.caching.redis_cache import RedisCache
 
